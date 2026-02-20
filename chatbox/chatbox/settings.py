@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["realtime-chat-irix.onrender.com","127.0.0.1"]
 
+
+
 CSRF_TRUSTED_ORIGINS = [
     "https://realtime-chat-irix.onrender.com",
 ]
@@ -39,6 +41,8 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
 # Application definition
+ASGI_APPLICATION = 'chatbox.asgi.application'
+
 
 INSTALLED_APPS = [
     'daphne',
@@ -54,7 +58,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'chatapp.CustomUser'
-ASGI_APPLICATION = 'chatbox.asgi.application'
+
 
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
