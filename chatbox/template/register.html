@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - ChatApp{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Create Account</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Email address</label>
+                <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required placeholder="Choose a username">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="Create a password">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-control" required
+                    placeholder="Repeat password">
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+        </form>
+        <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}
