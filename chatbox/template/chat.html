@@ -56,20 +56,26 @@
     // VERY IMPORTANT → receive message from server
     socket.onmessage = function (event) {
         const data = JSON.parse(event.data);
+        const currentUser = "{{ user.username }}";
 
-        // const messageElement = document.createElement("p");
-        // messageElement.innerHTML = "<b>" + data.user + ":</b> " + data.message;
         const messageElement = document.createElement("div");
-            messageElement.className = "message " + messageClass;
+        const isMe = data.user === currentUser;
 
-            messageElement.innerHTML = `
-                <div class="message {% if msg.sender == user %}message-sent{% else %}message-received{% endif %}">
-                    <div class="message-content">${msg.message}</div>
-                    <div class="message-time text-end">${msg.timestamp}</div>
-                </div>
-    `;        
+        // Match the Django template's class logic
+        messageElement.className = "message " + (isMe ? "message-sent" : "message-received");
+
+        messageElement.innerHTML = `
+            <div class="message-content">${data.message}</div>
+            <div class="message-time text-end">${data.timestamp}</div>
+        `;
 
         chatBox.appendChild(messageElement);
+
+        // Remove "No messages yet" if it exists
+        const noMessages = chatBox.querySelector('.text-muted.my-5');
+        if (noMessages) {
+            noMessages.remove();
+        }
 
         // auto scroll
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -92,12 +98,7 @@
         input.value = "";
     }
 
-    // press Enter to send
-    document.getElementById("message-input").addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-            sendMessage();
-        }
-    });
+
 </script>
 
 {% endblock %}
