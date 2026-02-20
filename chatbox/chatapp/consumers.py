@@ -35,7 +35,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Save message to database
             await self.save_message(user, receiver_id, message)
 
-            now = timezone.now().strftime("%H:%M")
+            now = timezone.localtime(timezone.now()).strftime("%H:%M")
 
             # Send to group
             await self.channel_layer.group_send(
