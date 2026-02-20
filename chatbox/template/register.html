@@ -1,33 +1,45 @@
 {% extends 'base.html' %}
 
-{% block title %}Register - ChatApp{% endblock %}
+{% block title %}Register - WhatsApp{% endblock %}
 
-{% block content %}
+{% block layout %}
 <div class="auth-container">
     <div class="auth-card">
-        <h2>Create Account</h2>
+        <div class="text-center mb-4">
+            <i class="bi bi-whatsapp" style="font-size: 50px; color: var(--wa-teal);"></i>
+            <h2 class="mt-2 fw-bold" style="color: #41525d;">Registration</h2>
+            <p class="text-secondary">Join WhatsApp and start chatting</p>
+        </div>
+
         <form method="POST">
             {% csrf_token %}
             <div class="mb-3">
-                <label class="form-label">Email address</label>
-                <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+                <label class="form-label small text-secondary fw-semibold">USERNAME</label>
+                <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" required placeholder="Choose a username">
+                <label class="form-label small text-secondary fw-semibold">EMAIL</label>
+                <input type="email" name="email" class="form-control" placeholder="Email address" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" required placeholder="Create a password">
+                <label class="form-label small text-secondary fw-semibold">PASSWORD</label>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" name="confirm_password" class="form-control" required
-                    placeholder="Repeat password">
+            <div class="mb-4">
+                <label class="form-label small text-secondary fw-semibold">CONFIRM PASSWORD</label>
+                <input type="password" name="confirm_password" class="form-control" placeholder="Confirm password"
+                    required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+            <button type="submit" class="btn w-100 py-2 text-white fw-bold"
+                style="background: #25d366; border-radius: 3px;">
+                REGISTER
+            </button>
         </form>
-        <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+
+        <div class="text-center mt-4">
+            <p class="mb-0 text-secondary">Already have an account? <a href="{% url 'login' %}"
+                    class="text-decoration-none" style="color: #00a884;">Login here</a></p>
+        </div>
     </div>
 </div>
 {% endblock %}

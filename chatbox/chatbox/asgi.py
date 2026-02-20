@@ -1,7 +1,6 @@
 import os
 import django
 
-# MUST be set before any Django/Channels imports
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chatbox.settings')
 django.setup()
 

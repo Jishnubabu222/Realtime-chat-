@@ -50,9 +50,17 @@ def logout_user(request):
     logout(request)
     return redirect('login')
 
+from django.db.models import Q, Count
+
 @login_required(login_url='login')
 def user_list(request):
-    users = CustomUser.objects.exclude(id=request.user.id)
+    # Annotate each user with the count of unread messages sent TO the current user
+    users = CustomUser.objects.exclude(id=request.user.id).annotate(
+        unread_count=Count(
+            'sent_messages',
+            filter=Q(receiver=request.user, is_read=False)
+        )
+    )
     return render(request, 'user_list.html', {'users': users})
 
 @login_required(login_url='login')
@@ -60,20 +68,24 @@ def chat_view(request, user_id):
     receiver = get_object_or_404(CustomUser, id=user_id)
     sender = request.user
 
-    if request.method == 'POST':
-        print("========================================")
-        msg_content = request.POST.get('message')
-        if msg_content:
-            Message.objects.create(sender=sender, receiver=receiver, message=msg_content)
-            return redirect('chat', user_id=user_id)
+    # Mark messages as read
+    Message.objects.filter(sender=receiver, receiver=sender, is_read=False).update(is_read=True)
 
-    # Get messages between sender and receiver
     messages_list = Message.objects.filter(
         (Q(sender=sender) & Q(receiver=receiver)) | 
         (Q(sender=receiver) & Q(receiver=sender))
     ).order_by('timestamp')
 
+    # Get all users for the sidebar with unread counts
+    users = CustomUser.objects.exclude(id=request.user.id).annotate(
+        unread_count=Count(
+            'sent_messages',
+            filter=Q(receiver=request.user, is_read=False)
+        )
+    )
+
     return render(request, 'chat.html', {
         'receiver': receiver,
-        'messages_list': messages_list
+        'messages_list': messages_list,
+        'users': users
     })

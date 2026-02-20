@@ -1,40 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Users - ChatApp{% endblock %}
+{% block title %}WhatsApp{% endblock %}
 
 {% block content %}
-<div class="user-list-container">
-    <div class="p-4 border-bottom bg-white">
-        <h3 class="mb-0 fw-bold">Recent Contacts</h3>
-    </div>
-    <div class="list-group list-group-flush">
-        {% for u in users %}
-        <a href="{% url 'chat' u.id %}" class="user-item">
-            <div class="d-flex align-items-center">
-                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                    style="width: 45px; height: 45px; font-weight: 600;">
-                    {{ u.username|slice:":1"|upper }}
-                </div>
-                <div>
-                    <h6 class="mb-0 fw-bold">{{ u.username }}</h6>
-                    <small class="text-muted">{{ u.email }}</small>
-                </div>
-            </div>
-            <div>
-                {% if u.is_online %}
-                <span class="status-indicator status-online"></span>
-                <small class="text-success ms-1">Online</small>
-                {% else %}
-                <span class="status-indicator status-offline"></span>
-                <small class="text-muted ms-1">Offline</small>
-                {% endif %}
-            </div>
-        </a>
-        {% empty %}
-        <div class="p-5 text-center text-muted">
-            No other users found.
+<div class="empty-chat">
+    <div class="text-center">
+        <i class="bi bi-whatsapp" style="font-size: 80px; color: #abb4ba;"></i>
+        <h1>WhatsApp Web</h1>
+        <p class="text-secondary mt-3">
+            Send and receive messages without keeping your phone online.<br>
+            Use WhatsApp on up to 4 linked devices and 1 phone at the same time.
+        </p>
+        <div class="mt-5 text-secondary small">
+            <i class="bi bi-lock-fill"></i> End-to-end encrypted
         </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}

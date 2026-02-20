@@ -5,58 +5,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Django Chat App{% endblock %}</title>
+    <title>{% block title %}WhatsApp Clone{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'users' %}">ChatApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <span class="nav-link">Hello, {{ user.username }}</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>
-                    {% endif %}
-                </ul>
+    {% block layout %}
+    <div class="app-wrapper">
+        <div class="main-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="d-flex align-items-center">
+                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=dfe5e7&color=54656f"
+                            class="user-avatar" alt="My Profile">
+                        <span class="ms-2 fw-semibold">{{ user.username }}</span>
+                    </div>
+                    <div class="d-flex gap-3 text-secondary">
+                        <i class="bi bi-chat-left-text-fill fs-5 cursor-pointer"></i>
+                        <a href="{% url 'logout' %}" class="text-secondary"><i
+                                class="bi bi-box-arrow-right fs-4 cursor-pointer"></i></a>
+                    </div>
+                </div>
+
+                <div class="sidebar-search">
+                    <div class="search-inner">
+                        <i class="bi bi-search text-secondary small"></i>
+                        <input type="text" placeholder="Search or start new chat">
+                    </div>
+                </div>
+
+                <div class="chat-list" id="sidebar-chat-list">
+                    {% for u in users %}
+                    <a href="{% url 'chat' u.id %}" class="chat-item {% if receiver.id == u.id %}active{% endif %}"
+                        id="sidebar-user-{{ u.id }}">
+                        <img src="https://ui-avatars.com/api/?name={{ u.username }}&background=random"
+                            class="user-avatar" alt="">
+                        <div class="chat-item-info">
+                            <div class="chat-item-header">
+                                <span class="chat-item-name">{{ u.username }}</span>
+                                <span class="chat-item-time">{% if u.is_online %}Online{% endif %}</span>
+                            </div>
+                            <div class="chat-item-lastmsg">
+                                <span class="status-text">
+                                    {% if u.is_online %}
+                                    <span class="text-success small">Online</span>
+                                    {% else %}
+                                    <span class="text-muted small">
+                                        {% if u.last_seen %}
+                                        last seen {{ u.last_seen|date:"H:i" }}
+                                        {% else %}
+                                        Away
+                                        {% endif %}
+                                    </span>
+                                    {% endif %}
+                                </span>
+                                <span class="unread-badge" id="unread-{{ u.id }}" {% if u.unread_count == 0 %}style="display:none;"{% endif %}>
+                                    {{ u.unread_count }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-window">
+                {% block content %}{% endblock %}
             </div>
         </div>
-    </nav>
-
-    <div class="container-fluid flex-grow-1">
-        {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% block content %}{% endblock %}
     </div>
+    {% endblock %}
+
+    <script>
+        // Global WebSocket for notifications
+        const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'chat_message') {
+                const currentUserId = "{{ user.id }}";
+
+                // If the message is for me, update unread count in sidebar (if not already in that chat)
+                if (data.receiver_id == currentUserId) {
+                    // Check if we are currently chatting with the sender
+                    const activeReceiverId = typeof receiverId !== 'undefined' ? receiverId : null;
+
+                    if (activeReceiverId != data.sender_id) {
+                        const badge = document.getElementById(`unread-${data.sender_id}`);
+                        if (badge) {
+                            let count = parseInt(badge.innerText) || 0;
+                            badge.innerText = count + 1;
+                            badge.style.display = 'flex';
+                        }
+                    }
+                }
+
+                // If a page-specific handler exists (like in chat.html), call it
+                if (window.handleIncomingMessage) {
+                    window.handleIncomingMessage(data);
+                }
+            } else if (data.type === 'message_deleted') {
+                if (window.handleMessageDeletion) {
+                    window.handleMessageDeletion(data);
+                }
+            }
+        };
+    </script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
