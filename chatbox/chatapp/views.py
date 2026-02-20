@@ -55,7 +55,7 @@ from django.db.models import Q, Count
 @login_required(login_url='login')
 def user_list(request):
     # Annotate each user with the count of unread messages sent TO the current user
-    users = CustomUser.objects.exclude(id=request.user.id).annotate(
+    users = CustomUser.objects.exclude(id=request.user.id).filter(is_staff=False).annotate(
         unread_count=Count(
             'sent_messages',
             filter=Q(sent_messages__receiver=request.user, sent_messages__is_read=False)
@@ -77,7 +77,7 @@ def chat_view(request, user_id):
     ).order_by('timestamp')
 
     # Get all users for the sidebar with unread counts
-    users = CustomUser.objects.exclude(id=request.user.id).annotate(
+    users = CustomUser.objects.exclude(id=request.user.id).filter(is_staff=False).annotate(
         unread_count=Count(
             'sent_messages',
             filter=Q(sent_messages__receiver=request.user, sent_messages__is_read=False)
