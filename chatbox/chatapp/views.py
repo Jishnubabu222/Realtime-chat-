@@ -58,7 +58,7 @@ def user_list(request):
     users = CustomUser.objects.exclude(id=request.user.id).annotate(
         unread_count=Count(
             'sent_messages',
-            filter=Q(receiver=request.user, is_read=False)
+            filter=Q(sent_messages__receiver=request.user, sent_messages__is_read=False)
         )
     )
     return render(request, 'user_list.html', {'users': users})
@@ -80,7 +80,7 @@ def chat_view(request, user_id):
     users = CustomUser.objects.exclude(id=request.user.id).annotate(
         unread_count=Count(
             'sent_messages',
-            filter=Q(receiver=request.user, is_read=False)
+            filter=Q(sent_messages__receiver=request.user, sent_messages__is_read=False)
         )
     )
 
