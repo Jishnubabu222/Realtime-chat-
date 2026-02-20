@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-b4e&75u$(*dffxsj&tp-0sz^3u4h9=5$&0l8sbp#^arm_8x_t_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["realtime-chat-irix.onrender.com"]
+ALLOWED_HOSTS = ["realtime-chat-irix.onrender.com","127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://realtime-chat-irix.onrender.com",
@@ -57,6 +57,7 @@ AUTH_USER_MODEL = 'chatapp.CustomUser'
 ASGI_APPLICATION = 'chatbox.asgi.application'
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
     
 ]
 
@@ -150,3 +152,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
