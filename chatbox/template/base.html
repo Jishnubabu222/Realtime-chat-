@@ -67,7 +67,8 @@
                                     </span>
                                     {% endif %}
                                 </span>
-                                <span class="unread-badge" id="unread-{{ u.id }}" {% if u.unread_count == 0 %}style="display:none;"{% endif %}>
+                                <span class="unread-badge" id="unread-{{ u.id }}" {% if u.unread_count==0
+                                    %}style="display:none;" {% endif %}>
                                     {{ u.unread_count }}
                                 </span>
                             </div>
@@ -87,7 +88,8 @@
 
     <script>
         // Global WebSocket for notifications
-        const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+        const ws_protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+        const socket = new WebSocket(ws_protocol + window.location.host + "/ws/chat/");
 
         socket.onmessage = function (event) {
             const data = JSON.parse(event.data);
